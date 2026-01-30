@@ -23,12 +23,25 @@ def run_prediction(file_path):
     
     student_results = []
     for i in range(len(df)):
+        prob = float(probs[i])
+        # Define thresholds for Risk Levels
+        if prob < 0.4:
+           risk_label = "High"
+        elif prob < 0.7:
+           risk_label = "Medium"
+        else:
+           risk_label = "Low"
+
         student_results.append({
-            "studentId": str(df.iloc[i].get('student_id', i)),
-            "score": float(df.iloc[i]['score']),
-            "riskLevel": "High" if probs[i] < 0.4 else "Low",
-            "completionProbability": round(float(probs[i]), 2)
-        })
+        "studentId": str(df.iloc[i].get('student_id', i)),
+        "score": float(df.iloc[i]['score']),
+        "riskLevel": risk_label,
+        "completionProbability": round(prob, 2)
+    })
+
+    
+    
+    
 
     # 2. FEATURE #3: Chapter Difficulty Logic
     # We calculate average score and time spent per chapter

@@ -12,9 +12,11 @@ app.use(express.json());
 
 // Import your routes
 const uploadRoutes = require("./routes/uploadRoutes");
+const chatRoutes = require("./routes/chat");
 
 // Use your routes
 app.use("/api", uploadRoutes);
+app.use("/api/chat", chatRoutes);
 
 // MongoDB Connection
 // You will get this URL from MongoDB Atlas (free)

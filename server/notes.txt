@@ -1,0 +1,32 @@
+# # Create the server directory
+# mkdir server
+# cd server
+
+# # Initialize a Node.js project
+# npm init -y
+
+# # Install the necessary "Lego Blocks"
+# # express: the server framework
+# # mongoose: to connect to MongoDB
+# # multer: to handle file uploads
+# # cors: to allow React to talk to the server
+# # dotenv: to keep your passwords/secrets safe
+# npm install express mongoose multer cors dotenv
+
+
+
+
+
+mkdir uploads
+mkdir models
+mkdir routes
+touch index.js
+touch .env
+
+mkdir for folder/directory
+touch for file 
+echo also for file
+
+
+==================================
+npm install @google/generative-ai @huggingface/inference
