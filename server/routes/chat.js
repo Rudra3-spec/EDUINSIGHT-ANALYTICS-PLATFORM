@@ -9,25 +9,26 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const hf = new HfInference(process.env.HF_ACCESS_TOKEN);
 
 // ---------------------------------------------------------
-// ENDPOINT 1: GEMINI (Paid Tier / High Performance)
+// ENDPOINT 1: GEMINI (High Performance)
 // ---------------------------------------------------------
 router.post("/gemini", async (req, res) => {
   const { message, studentData } = req.body;
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Updated to a faster, newer model
 
-    // Formatting context for the AI
     const prompt = `
       System: You are an AI Mentor for the "LegalEagle" project. 
-      Data: Here is the current student analytics data: ${JSON.stringify(studentData)}.
+      Context Data: ${JSON.stringify(studentData)}
       User Question: ${message}
-      Instruction: Provide a data-driven, concise answer based ONLY on the provided JSON.
+      Instruction: Provide a data-driven, concise answer based ONLY on the provided JSON. 
+      If the data is missing, inform the user politely.
     `;
 
     const result = await model.generateContent(prompt);
-    const response = await result.response;
-    res.json({ text: response.text() });
+    const text = result.response.text();
+
+    res.json({ text });
   } catch (error) {
     console.error("Gemini Error:", error);
     res.status(500).json({ error: "Gemini API failed to respond." });
@@ -35,27 +36,38 @@ router.post("/gemini", async (req, res) => {
 });
 
 // ---------------------------------------------------------
-// ENDPOINT 2: HUGGING FACE (Free Models / Open Source)
-// ---------------------------------------------------------
+// huggingface
+
 router.post("/huggingface", async (req, res) => {
   const { message, studentData } = req.body;
 
   try {
-    const context = `Context: ${JSON.stringify(studentData)}. Question: ${message}`;
+    const response = await hf.textGeneration({
+      model: "google/flan-t5-large", // ✅ runs on free API reliably
+      inputs: `
+You are an AI Mentor for LegalEagle.
 
-    const out = await hf.textGeneration({
-      model: "mistralai/Mistral-7B-v0.3", // High-quality free model
-      inputs: `<s>[INST] You are a teaching assistant for Rudraksh. Using this data: ${context} [/INST]`,
+Student Data:
+${JSON.stringify(studentData)}
+
+Question:
+${message}
+
+Give a short, data-driven answer only from the data.
+      `,
       parameters: {
-        max_new_tokens: 300,
-        temperature: 0.7,
+        max_new_tokens: 200,
       },
     });
 
-    res.json({ text: out.generated_text });
+    res.json({ text: response.generated_text });
   } catch (error) {
-    console.error("HF Error:", error);
-    res.status(500).json({ error: "Hugging Face Inference failed." });
+    console.error("DETAILED HF ERROR:", error.message);
+
+    res.status(500).json({
+      error: "HF overloaded",
+      details: "Using Gemini is recommended right now.",
+    });
   }
 });
 

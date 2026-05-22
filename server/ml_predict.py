@@ -15,6 +15,7 @@ ML_FOLDER = os.path.join(BASE_DIR, "..", "ML")
 
 def run_prediction(file_path):
     model = joblib.load(os.path.join(ML_FOLDER, 'completion_model.joblib'))
+    
     df = pd.read_csv(file_path)
 
     # 1. Individual Predictions (What we already have)

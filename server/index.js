@@ -13,6 +13,10 @@ app.use(express.json());
 // Import your routes
 const uploadRoutes = require("./routes/uploadRoutes");
 const chatRoutes = require("./routes/chat");
+const authRoutes = require("./routes/auth");
+
+// Mount the auth routes
+app.use("/api/auth", authRoutes);
 
 // Use your routes
 app.use("/api", uploadRoutes);
