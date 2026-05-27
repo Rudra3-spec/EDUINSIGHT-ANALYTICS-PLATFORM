@@ -7,7 +7,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
-  Cell,
 } from "recharts";
 
 const DifficultyChart = ({ data }) => {

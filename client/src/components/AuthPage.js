@@ -435,11 +435,11 @@ const toggleText = { color: "#64748b", fontSize: "0.9rem" };
 const activeLink = { color: "#818cf8", fontWeight: "bold", cursor: "pointer" };
 
 // Temporary helper style just in case
-const authContainerStyle = {
-  height: "100vh",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  background: "#0f172a",
-};
+// const authContainerStyle = {
+//   height: "100vh",
+//   display: "flex",
+//   justifyContent: "center",
+//   alignItems: "center",
+//   background: "#0f172a",
+// };
 export default AuthPage;
