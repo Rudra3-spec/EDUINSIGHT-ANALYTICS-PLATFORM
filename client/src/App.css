@@ -1,0 +1,43 @@
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: "Inter", sans-serif;
+  color: #333;
+}
+
+.dashboard-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  background: #ffffff;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.tab-menu {
+  display: flex;
+  background: #f8f9fa;
+  border-bottom: 1px solid #eee;
+  padding: 0 20px;
+}
+
+.tab-item {
+  padding: 15px 25px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #666;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-item.active {
+  color: #5a67d8;
+  border-bottom-color: #5a67d8;
+}
+
+.stat-card {
+  border-radius: 12px;
+  padding: 20px;
+  color: white;
+  text-align: center;
+  transition: transform 0.2s;
+}

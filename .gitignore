@@ -1,3 +1,8 @@
 imp_note.txt
 important_chatgpt_links.txt
 .github
+
+node_modules/
+.env
+dist/
+build/
