@@ -305,6 +305,7 @@ import RiskTable from "./components/RiskTable";
 import ChapterTable from "./components/ChapterTable";
 import FullReport from "./components/FullReport";
 import DifficultyChart from "./components/DifficultyChart";
+import { API_URL } from "./config";
 
 // 1. GLOBAL AXIOS INTERCEPTOR
 axios.interceptors.request.use((config) => {
@@ -337,7 +338,7 @@ function Dashboard({ data, setData, loading, setLoading, handleLogout }) {
     setLoading(true);
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/analyze-previous`,
+        `${API_URL}/api/analyze-previous`,
         { fileId: file._id },
       );
       if (response.data && response.data.analysis) {
@@ -356,7 +357,7 @@ function Dashboard({ data, setData, loading, setLoading, handleLogout }) {
     setLoading(true);
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/upload`,
+        `${API_URL}/api/upload`,
         formData,
       );
       setData(response.data.analysis);
@@ -382,7 +383,7 @@ function Dashboard({ data, setData, loading, setLoading, handleLogout }) {
   const handleClearData = async () => {
     if (window.confirm("Are you sure?")) {
       try {
-        await axios.delete("http://localhost:5000/api/clear");
+        await axios.delete(`${API_URL}/api/clear`);
         setData({ students: [], chapters: [], insight: "" });
         window.location.reload();
       } catch (err) {
@@ -489,7 +490,7 @@ function App() {
     if (!token) return;
     const fetchExistingData = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/students");
+        const res = await axios.get(`${API_URL}/api/students`);
         if (res.data && res.data.length > 0) {
           setData((prev) => ({ ...prev, students: res.data }));
         }

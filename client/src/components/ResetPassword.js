@@ -44,6 +44,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_URL } from "../config";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -54,7 +55,7 @@ const ResetPassword = () => {
     e.preventDefault();
     try {
       await axios.post(
-        `http://localhost:5000/api/auth/reset-password/${token}`,
+        `${API_URL}/api/auth/reset-password/${token}`,
         { password },
       );
       alert("Password updated!");

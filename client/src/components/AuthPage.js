@@ -169,6 +169,7 @@
 // export default AuthPage;
 import React, { useState } from "react";
 import axios from "axios";
+import { API_URL } from "../config";
 
 const AuthPage = ({ onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -185,7 +186,7 @@ const AuthPage = ({ onLoginSuccess }) => {
     if (showForgot) {
       try {
         const res = await axios.post(
-          "http://localhost:5000/api/auth/forgot-password",
+          `${API_URL}/api/auth/forgot-password`,
           { email: resetEmail },
         );
         alert(res.data.msg);
@@ -198,10 +199,7 @@ const AuthPage = ({ onLoginSuccess }) => {
 
     const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
     try {
-      const res = await axios.post(
-        `http://localhost:5000${endpoint}`,
-        formData,
-      );
+      const res = await axios.post(`${API_URL}${endpoint}`, formData);
       if (isLogin) {
         localStorage.setItem("token", res.data.token);
         onLoginSuccess(res.data.user);

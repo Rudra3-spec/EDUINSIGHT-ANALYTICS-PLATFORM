@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-
-const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
+import { API_URL } from "../config";
 
 const MentorChat = ({ studentData }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,7 +28,7 @@ const MentorChat = ({ studentData }) => {
     setLoading(true);
 
     try {
-      const res = await axios.post(`${API}/api/chat/gemini`, {
+      const res = await axios.post(`${API_URL}/api/chat/gemini`, {
         message: text,
         studentData: studentData,
       });

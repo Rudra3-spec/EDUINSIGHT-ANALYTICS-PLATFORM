@@ -102,15 +102,17 @@ npm install
 npm start
 ```
 
-The application will open at `http://localhost:3000`, and the API runs at `http://localhost:5000`.
+The application will open at `http://localhost:3000`. By default, it connects to the deployed API at `https://eduinsight-backend-final.onrender.com`.
 
 For a backend hosted at another URL, create `client/.env`:
 
 ```env
-REACT_APP_API_URL=http://localhost:5000
+REACT_APP_API_URL=https://eduinsight-backend-final.onrender.com
 ```
 
 Restart the React development server after changing environment variables.
+
+For local backend development, use `REACT_APP_API_URL=http://localhost:5000`.
 
 ## Dataset Format
 

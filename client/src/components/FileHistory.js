@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { API_URL } from "../config";
 
 const FileHistory = ({ onSelectFile }) => {
   const [files, setFiles] = useState([]);
@@ -10,7 +11,7 @@ const FileHistory = ({ onSelectFile }) => {
 
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/previous-files",
+          `${API_URL}/api/previous-files`,
           {
             headers: { "x-auth-token": token },
           },
