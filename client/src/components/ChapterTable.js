@@ -151,17 +151,30 @@ const ChapterTable = ({ chapters }) => {
                       background:
                         ch.difficulty > 60
                           ? "rgba(248, 113, 113, 0.2)"
-                          : "rgba(251, 191, 36, 0.2)",
-                      color: ch.difficulty > 60 ? "#f87171" : "#fbbf24",
+                          : ch.difficulty > 40
+                          ? "rgba(251, 191, 36, 0.2)"
+                          : "rgba(52, 211, 153, 0.2)",
+                      color:
+                        ch.difficulty > 60
+                          ? "#f87171"
+                          : ch.difficulty > 40
+                          ? "#fbbf24"
+                          : "#34d399",
                       border: `1px solid ${
-                        ch.difficulty > 60 ? "#f87171" : "#fbbf24"
+                        ch.difficulty > 60
+                          ? "#f87171"
+                          : ch.difficulty > 40
+                          ? "#fbbf24"
+                          : "#34d399"
                       }`,
                     }}
                   >
-                    {ch.difficulty > 60 ? "Hard" : "Medium"}
+                    {ch.difficulty > 60 ? "Hard" : ch.difficulty > 40 ? "Medium" : "Easy"}
                   </span>
                 </td>
-                <td style={{ color: "#cbd5e0" }}>{100 - ch.difficulty}</td>
+                <td style={{ color: "#cbd5e0" }}>
+                  {ch.avgScore !== undefined ? `${ch.avgScore}%` : "N/A"}
+                </td>
                 <td style={{ color: "#cbd5e0" }}>{ch.avgTime}m</td>
               </tr>
             ))}

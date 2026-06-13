@@ -72,7 +72,7 @@ const RiskTable = ({ students }) => {
       {/* 2. FULL STUDENT LIST (SCROLLABLE) */}
       <div className="glass-card" style={{ padding: "24px" }}>
         <h4 style={{ color: "#818cf8", marginBottom: "20px" }}>
-          ⚠️ Students Requiring Immediate Intervention
+          📋 All Students — Risk Analysis
         </h4>
         <div
           style={{
@@ -130,10 +130,21 @@ const RiskTable = ({ students }) => {
                         background:
                           s.riskLevel === "High"
                             ? "rgba(248, 113, 113, 0.15)"
+                            : s.riskLevel === "Medium"
+                            ? "rgba(251, 191, 36, 0.15)"
                             : "rgba(52, 211, 153, 0.15)",
-                        color: s.riskLevel === "High" ? "#f87171" : "#34d399",
+                        color:
+                          s.riskLevel === "High"
+                            ? "#f87171"
+                            : s.riskLevel === "Medium"
+                            ? "#fbbf24"
+                            : "#34d399",
                         border: `1px solid ${
-                          s.riskLevel === "High" ? "#f87171" : "#34d399"
+                          s.riskLevel === "High"
+                            ? "#f87171"
+                            : s.riskLevel === "Medium"
+                            ? "#fbbf24"
+                            : "#34d399"
                         }`,
                       }}
                     >

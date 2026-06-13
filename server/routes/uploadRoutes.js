@@ -68,40 +68,107 @@ const auth = (req, res, next) => {
 };
 
 // 1. Setup Storage
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, "../uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
-  destination: "./uploads/",
+  destination: uploadsDir,
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
   },
 });
-const upload = multer({ storage });
+
+// Only accept CSV and Excel files
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = [
+    "text/csv",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  ];
+  const allowedExts = [".csv", ".xls", ".xlsx"];
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (allowedTypes.includes(file.mimetype) || allowedExts.includes(ext)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only CSV and Excel (.xls, .xlsx) files are allowed"), false);
+  }
+};
+
+const upload = multer({ storage, fileFilter });
 
 // Helper function to run ML Analysis
 const runMLAnalysis = (filePath) => {
   return new Promise((resolve, reject) => {
-    const pythonProcess = spawn("python", ["ml_predict.py", filePath]);
+    const scriptPath = path.join(__dirname, "../ml_predict.py");
+    const absoluteFilePath = path.resolve(filePath);
+    // Set thread env vars to prevent numpy/BLAS from hanging on startup
+    const pythonEnv = {
+      ...process.env,
+      OMP_NUM_THREADS: "1",
+      OPENBLAS_NUM_THREADS: "1",
+      MKL_NUM_THREADS: "1",
+    };
+    const pythonProcess = spawn("python", [scriptPath, absoluteFilePath], {
+      env: pythonEnv,
+    });
     let resultData = "";
+    let errorData = "";
+
     pythonProcess.stdout.on("data", (data) => {
       resultData += data.toString();
     });
+    pythonProcess.stderr.on("data", (data) => {
+      errorData += data.toString();
+    });
     pythonProcess.on("close", (code) => {
-      if (code !== 0) reject("Python script failed");
-      else resolve(JSON.parse(resultData));
+      try {
+        const parsed = JSON.parse(resultData);
+        // ml_predict.py always outputs JSON — check if it contains an error key
+        if (parsed.error) {
+          console.error("ML script returned error:", parsed.error);
+          reject(new Error(parsed.error));
+        } else {
+          resolve(parsed);
+        }
+      } catch (parseErr) {
+        // Python crashed before printing JSON
+        const errMsg = errorData || resultData || "Unknown Python error";
+        console.error("Python script crashed:", errMsg);
+        reject(new Error(`ML analysis failed: ${errMsg.slice(0, 300)}`));
+      }
     });
   });
 };
 
 // 2. Upload and Analyze New File (PROTECTED)
-router.post("/upload", [auth, upload.single("file")], async (req, res) => {
+// Note: In Express v5, middleware must be chained separately, not passed as an array
+router.post("/upload", auth, upload.single("file"), async (req, res) => {
   try {
+    // multer fileFilter error comes through as req.fileValidationError
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded. Please upload a CSV or Excel file." });
+    }
+
     const newFile = new File({
       fileName: req.file.originalname,
       filePath: req.file.path,
-      teacherId: req.user.id, // Now links file to the logged-in teacher
+      teacherId: req.user.id,
     });
     await newFile.save();
 
-    const analysis = await runMLAnalysis(req.file.path);
+    let analysis;
+    try {
+      analysis = await runMLAnalysis(req.file.path);
+    } catch (mlErr) {
+      // Delete the saved file record since analysis failed
+      await newFile.deleteOne();
+      return res.status(422).json({
+        error: mlErr.message || "ML analysis failed. Check your file format and required columns.",
+      });
+    }
 
     res.json({
       message: "Analysis Complete!",
@@ -109,7 +176,8 @@ router.post("/upload", [auth, upload.single("file")], async (req, res) => {
       analysis: analysis,
     });
   } catch (err) {
-    res.status(500).json({ error: "Upload or Analysis failed" });
+    console.error("Upload error:", err);
+    res.status(500).json({ error: "Upload failed", details: err.message });
   }
 });
 

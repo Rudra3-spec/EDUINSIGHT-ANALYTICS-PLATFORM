@@ -222,13 +222,13 @@ const AuthPage = ({ onLoginSuccess }) => {
 
       <div className="glass-card" style={proGlassCard}>
         <div style={cardHeader}>
-          <div style={logoCircle}>LE</div>
+          <div style={logoCircle}>EI</div>
           <h2 style={proTitle}>
             {showForgot
               ? "Secure Reset"
               : isLogin
                 ? "Welcome Back"
-                : "Join LegalEagle"}
+                : "Join EduInsight"}
           </h2>
           <p style={proSubtitle}>
             {showForgot

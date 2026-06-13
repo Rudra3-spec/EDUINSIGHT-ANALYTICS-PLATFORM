@@ -330,10 +330,6 @@ axios.interceptors.request.use((config) => {
 
 // SUB-COMPONENT: DASHBOARD
 
-console.log("Checking Components:");
-console.log("LandingPage:", typeof LandingPage);
-console.log("AuthPage:", typeof AuthPage);
-console.log("ResetPassword:", typeof ResetPassword);
 function Dashboard({ data, setData, loading, setLoading, handleLogout }) {
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -341,12 +337,11 @@ function Dashboard({ data, setData, loading, setLoading, handleLogout }) {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/analyze-previous",
+        `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/analyze-previous`,
         { fileId: file._id },
       );
       if (response.data && response.data.analysis) {
         setData(response.data.analysis);
-        alert(`Switched to analysis for: ${file.fileName}`);
       }
     } catch (error) {
       console.error("Analysis failed:", error);
@@ -361,13 +356,13 @@ function Dashboard({ data, setData, loading, setLoading, handleLogout }) {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/upload",
+        `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/upload`,
         formData,
       );
       setData(response.data.analysis);
-      alert("ML Analysis Complete!");
     } catch (error) {
-      alert(error.response?.data?.msg || "Failed to process file.");
+      const msg = error.response?.data?.error || error.response?.data?.msg || "Failed to process file. Check your file format.";
+      alert(msg);
     } finally {
       setLoading(false);
     }

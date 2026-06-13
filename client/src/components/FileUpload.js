@@ -2,10 +2,23 @@ import React, { useState } from "react";
 
 const FileUpload = ({ onUpload, loading }) => {
   const [file, setFile] = useState(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = () => {
-    if (file) onUpload(file);
-    else alert("Please select a file first!");
+    if (file) {
+      setError("");
+      onUpload(file);
+    } else {
+      setError("Please select a file first.");
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    const dropped = e.dataTransfer.files[0];
+    if (dropped) setFile(dropped);
   };
 
   return (
@@ -19,11 +32,14 @@ const FileUpload = ({ onUpload, loading }) => {
       }}
     >
       <div
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={handleDrop}
         style={{
-          border: "3px dashed rgba(129, 138, 248, 0.3)",
+          border: `3px dashed ${dragOver ? "#818cf8" : "rgba(129, 138, 248, 0.3)"}`,
           borderRadius: "24px",
           padding: "60px 20px",
-          background: "rgba(79, 70, 229, 0.03)",
+          background: dragOver ? "rgba(79, 70, 229, 0.07)" : "rgba(79, 70, 229, 0.03)",
           transition: "all 0.3s ease",
         }}
       >
@@ -32,15 +48,15 @@ const FileUpload = ({ onUpload, loading }) => {
           Upload Learner Data
         </h2>
         <p style={{ color: "#94a3b8", marginBottom: "30px" }}>
-          Drag and drop your CSV file or click to browse
+          Drag & drop your CSV or Excel file here, or click to browse
         </p>
 
         <input
           type="file"
           id="fileInput"
           style={{ display: "none" }}
-          onChange={(e) => setFile(e.target.files[0])}
-          accept=".csv"
+          onChange={(e) => { setFile(e.target.files[0]); setError(""); }}
+          accept=".csv,.xls,.xlsx"
         />
         <label
           htmlFor="fileInput"
@@ -55,7 +71,7 @@ const FileUpload = ({ onUpload, loading }) => {
             boxShadow: "0 4px 14px 0 rgba(79, 70, 229, 0.39)",
           }}
         >
-          {file ? `✅ ${file.name}` : "Choose CSV File"}
+          {file ? `✅ ${file.name}` : "Choose File"}
         </label>
       </div>
 
@@ -88,7 +104,6 @@ const FileUpload = ({ onUpload, loading }) => {
         >
           {[
             "student_id",
-            "course_id",
             "chapter_order",
             "time_spent",
             "score",
@@ -107,14 +122,24 @@ const FileUpload = ({ onUpload, loading }) => {
             </code>
           ))}
         </div>
+        <p style={{ color: "#475569", fontSize: "0.78rem", marginTop: "10px", marginBottom: 0 }}>
+          Column names are case-insensitive. Extra columns are ignored.
+        </p>
       </div>
+
+      {/* Error message */}
+      {error && (
+        <p style={{ color: "#f87171", marginTop: "12px", fontSize: "0.9rem", marginBottom: 0 }}>
+          ⚠️ {error}
+        </p>
+      )}
 
       <button
         onClick={handleSubmit}
         disabled={loading || !file}
         style={{
           width: "100%",
-          marginTop: "30px",
+          marginTop: "20px",
           padding: "18px",
           background:
             loading || !file
@@ -130,6 +155,7 @@ const FileUpload = ({ onUpload, loading }) => {
             loading || !file
               ? "none"
               : "0 10px 20px -5px rgba(99, 102, 241, 0.5)",
+          transition: "all 0.2s ease",
         }}
       >
         {loading ? "⚡ ANALYZING DATA..." : "RUN AI PREDICTIONS"}
